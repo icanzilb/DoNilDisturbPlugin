@@ -3,7 +3,12 @@ import PackageDescription
 
 let package = Package(
     name: "DoNotDisturbPlugin",
-    platforms: [.macOS(.v12)],
+    platforms: [
+        .macOS(.v11),
+        .iOS(.v13),
+        .tvOS(.v13),
+        .watchOS(.v8)
+    ],
     products: [
         .plugin(name: "DoNilDisturbPlugin", targets: ["DoNilDisturb"])
     ],

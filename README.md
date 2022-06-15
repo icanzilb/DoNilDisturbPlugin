@@ -9,7 +9,7 @@ The plugin stops you from working on your 9-5 project outside of 9-5 hours:
 Add this to your dependencies in your Package.swift:
 
 ```swift
-.package(url: "https://github.com/icanzilb/DoNilDisturbPlugin.git", from: "0.0.1"),
+.package(url: "https://github.com/icanzilb/DoNilDisturbPlugin.git", from: "0.0.2"),
 ```
 
 **And then**, add the plugin in your target definition(still in Package.swift:
@@ -18,7 +18,7 @@ Add this to your dependencies in your Package.swift:
 .target(
   name: "MyTarget",
   plugins: [
-    .plugin(name: "DoNilDisturbPlugin")
+    .plugin(name: "DoNilDisturbPlugin", package: "DoNilDisturbPlugin")
   ]
 )
 ```
