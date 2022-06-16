@@ -5,9 +5,17 @@ extension String: Error { }
 @main class PluginBinary {
     static func main() throws {
         let outputURL = URL(fileURLWithPath: ProcessInfo.processInfo.arguments[1])
+
+        let content = content(for: Date())
+
+        try content.write(to: outputURL, atomically: true, encoding: .utf8)
+    }
+
+    static func content(for date: Date) -> String {
         let content: String
 
-        if (9.0...18.0 ~= Date().time) { // Your 9-6 basically
+        if (false == Calendar.current.isDateInWeekend(date) && // Exclude weekend
+            9.0...18.0 ~= date.time) { // Your 9-6 basically
             // Working hours
             content = "// All is good, do not disturb is off."
         } else {
@@ -15,7 +23,7 @@ extension String: Error { }
             content = #"#error("Do not disturb is ON")"#
         }
 
-        try content.write(to: outputURL, atomically: true, encoding: .utf8)
+        return content
     }
 }
 
