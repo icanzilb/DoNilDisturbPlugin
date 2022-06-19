@@ -27,6 +27,16 @@ That's all. Your target will fail to build outside of working hours.
 
 Enjoy your time off work.
 
+## Public Holidays support
+
+Grab an **.ics** file containing the public holidays for your locality. For example, grab this one for Spanish holidays: https://www.officeholidays.com/ics-clean/spain
+
+Save the calendar file under your project's root directory in a sub-directory called `.config/DoNilDisturb`
+
+The plugin will now respect your holidays:
+
+![Error message in Xcode failing to build because it's a public holiday](etc/holidays.png)
+
 ## License
 
 MIT, of course.
