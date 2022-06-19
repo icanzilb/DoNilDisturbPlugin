@@ -12,6 +12,9 @@ let package = Package(
     products: [
         .plugin(name: "DoNilDisturbPlugin", targets: ["DoNilDisturb"])
     ],
+    dependencies: [
+        .package(url: "https://github.com/icanzilb/iCalendar.git", from: "0.0.1")
+    ],
     targets: [
         // Your app or library
         .executableTarget(
@@ -23,6 +26,9 @@ let package = Package(
         // Your plugin's IMPLEMENTATION
         .executableTarget(
             name: "PluginBinary",
+            dependencies: [
+                .product(name: "iCalendar", package: "iCalendar")
+            ],
             path: "PluginBinary"
         ),
         // Your plugin's INTERFACE
