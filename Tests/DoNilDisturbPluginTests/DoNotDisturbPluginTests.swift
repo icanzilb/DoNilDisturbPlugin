@@ -8,10 +8,8 @@ final class DoNotDisturbPluginTests: XCTestCase {
     
     func testHolidayLoad() throws {
         let date = Foundation.Calendar.current.date(from: DateComponents(year: 2022, month: 8, day: 30, hour: 13))!
-        let path = #filePath
-        let parent = (path as NSString).deletingLastPathComponent
-        let icalPath = parent.appending("/TestCal.ics")
-        let icalContents = try String(contentsOfFile: icalPath)
+        let calendarFileURL = try XCTUnwrap(Bundle.module.url(forResource: "TestCal", withExtension: "ics", subdirectory: "Resources"))
+        let icalContents = try String(contentsOf: calendarFileURL)
         let parseResult = Parser.parse(ics: icalContents)
         switch parseResult {
         case .success(let calendar):

@@ -39,10 +39,15 @@ let package = Package(
                 .target(name: "PluginBinary")
             ]
         ),
-        .testTarget(name: "DoNilDisturbPluginTests",
-                    dependencies: [
-                        .target(name: "PluginBinary"),
-                        .product(name: "iCalendar", package: "iCalendar")
-                    ])
+        .testTarget(
+            name: "DoNilDisturbPluginTests",
+            dependencies: [
+                .target(name: "PluginBinary"),
+                .product(name: "iCalendar", package: "iCalendar")
+            ],
+            resources: [
+                .copy("Resources"),
+            ]
+        )
     ]
 )
