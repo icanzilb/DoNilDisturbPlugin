@@ -47,15 +47,15 @@ extension String: Error { }
         try writeLog(at: URL(fileURLWithPath: invocation.logPath))
     }
 
-    static func content(for date: Date, holidayColendars: [iCalendar.Calendar]) -> String {
+    static func content(for date: Date, holidayColendars: [iCalendar.Calendar], systemCalendar: Foundation.Calendar = .current) -> String {
         log("Current date: \(date.debugDescription)")
 
         if let holidaySummary = holidayColendars
             .mapFirst(where: { calendar in
                 return calendar.events.mapFirst { event in
                     // iCalendar creates dates for all-day things at noon rather than midnight, so we need to compare date components instead of dates
-                    let startDateComponents = Foundation.Calendar.current.dateComponents([.year, .month, .day], from: event.startDate)
-                    let currentDateComponents = Foundation.Calendar.current.dateComponents([.year, .month, .day], from: date)
+                    let startDateComponents = systemCalendar.dateComponents([.year, .month, .day], from: event.startDate)
+                    let currentDateComponents = systemCalendar.dateComponents([.year, .month, .day], from: date)
                     if startDateComponents.year == currentDateComponents.year,
                        startDateComponents.month == currentDateComponents.month,
                        startDateComponents.day == currentDateComponents.day {
@@ -69,15 +69,19 @@ extension String: Error { }
             return content(withReason: holidaySummary)
         }
 
-        if Calendar.current.isDateInWeekend(date) { // Exclude weekend
+        if systemCalendar.isDateInWeekend(date) { // Exclude weekend
             return content(withReason: "It's the weekend")
-        } else if (9.0...18.0 ~= date.time) { // Your 9-6 basically
-            let formatter = DateFormatter()
-            formatter.dateStyle = .none
-            return content(withReason: "It's \(formatter.string(from: date))")
+        } else if (9.0...18.0 ~= date.time) {
+            // Time is in the 9am-6pm range
+            return "// All is good, do not disturb is off."
         }
-
-        return "// All is good, do not disturb is off."
+        
+        let formatter = DateFormatter()
+        formatter.dateStyle = .none
+        formatter.timeStyle = .short
+        formatter.locale = systemCalendar.locale
+        
+        return content(withReason: "It's \(formatter.string(from: date))")
     }
 
     private static func content(withReason reason: String) -> String {
