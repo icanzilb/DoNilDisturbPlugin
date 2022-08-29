@@ -50,13 +50,16 @@ extension String: Error { }
     static func content(for date: Date, holidayColendars: [iCalendar.Calendar]) -> String {
         log("Current date: \(date.debugDescription)")
 
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM-dd-yy"
-
         if let holidaySummary = holidayColendars
             .mapFirst(where: { calendar in
                 return calendar.events.mapFirst { event in
-                    if dateFormatter.string(from: date) == dateFormatter.string(from: event.startDate) {                        log("ITS NOW!")
+                    // iCalendar creates dates for all-day things at noon rather than midnight, so we need to compare date components instead of dates
+                    let startDateComponents = Foundation.Calendar.current.dateComponents([.year, .month, .day], from: event.startDate)
+                    let currentDateComponents = Foundation.Calendar.current.dateComponents([.year, .month, .day], from: date)
+                    if startDateComponents.year == currentDateComponents.year,
+                       startDateComponents.month == currentDateComponents.month,
+                       startDateComponents.day == currentDateComponents.day {
+                        log("ITS NOW!")
                         return "It is \(event.summary ?? "a holiday")"
                     }
                     return nil
