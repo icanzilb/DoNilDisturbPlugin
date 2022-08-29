@@ -56,6 +56,9 @@ extension String: Error { }
                     // iCalendar creates dates for all-day things at noon rather than midnight, so we need to compare date components instead of dates
                     let startDateComponents = systemCalendar.dateComponents([.year, .month, .day], from: event.startDate)
                     let currentDateComponents = systemCalendar.dateComponents([.year, .month, .day], from: date)
+                    log("Start components: \(startDateComponents)")
+                    log("Current components: \(currentDateComponents)")
+
                     if startDateComponents.year == currentDateComponents.year,
                        startDateComponents.month == currentDateComponents.month,
                        startDateComponents.day == currentDateComponents.day {
