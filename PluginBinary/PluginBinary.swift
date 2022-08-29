@@ -25,7 +25,7 @@ extension String: Error { }
             log("Holidays: \(calPath.replacingOccurrences(of: invocation.packagePath + "/", with: ""))")
         }
 
-        let holidayColendars = try invocation.calendarPaths
+        let holidayCalendars = try invocation.calendarPaths
             .compactMap({
                 return Parser.parse(ics: try String(contentsOfFile: $0)).value
             })
@@ -38,7 +38,7 @@ extension String: Error { }
 //        let date = dateFormatter.date(from:isoDate)!
 
         let date = Date()
-        let content = content(for: date, holidayColendars: holidayColendars)
+        let content = content(for: date, holidayCalendars: holidayCalendars)
         try content.write(to: outputURL, atomically: true, encoding: .utf8)
 
         log("Written '\(invocation.sourcePath)'")
@@ -47,10 +47,10 @@ extension String: Error { }
         try writeLog(at: URL(fileURLWithPath: invocation.logPath))
     }
 
-    static func content(for date: Date, holidayColendars: [iCalendar.Calendar], systemCalendar: Foundation.Calendar = .current) -> String {
+    static func content(for date: Date, holidayCalendars: [iCalendar.Calendar], systemCalendar: Foundation.Calendar = .current) -> String {
         log("Current date: \(date.debugDescription)")
 
-        if let holidaySummary = holidayColendars
+        if let holidaySummary = holidayCalendars
             .mapFirst(where: { calendar in
                 return calendar.events.mapFirst { event in
                     // iCalendar creates dates for all-day things at noon rather than midnight, so we need to compare date components instead of dates

@@ -15,7 +15,7 @@ final class DoNotDisturbPluginTests: XCTestCase {
         let parseResult = Parser.parse(ics: icalContents)
         switch parseResult {
         case .success(let calendar):
-            let content = PluginBinary.content(for: date, holidayColendars: [calendar])
+            let content = PluginBinary.content(for: date, holidayCalendars: [calendar])
             XCTAssertEqual(content,
 """
 #error("Do not disturb is ON")
@@ -29,7 +29,7 @@ final class DoNotDisturbPluginTests: XCTestCase {
     func testWeekendError() throws {
         let sunday = Calendar.current.date(from: DateComponents(year: 2022, month: 08, day: 28))!
         
-        let content = PluginBinary.content(for: sunday, holidayColendars: [])
+        let content = PluginBinary.content(for: sunday, holidayCalendars: [])
         XCTAssertEqual(content,
 """
 #error("Do not disturb is ON")
@@ -46,7 +46,7 @@ final class DoNotDisturbPluginTests: XCTestCase {
         let monday2am = calendar.date(from: DateComponents(year: 2022, month: 08, day: 29, hour: 2))!
         
         let content = PluginBinary.content(for: monday2am,
-                                           holidayColendars: [],
+                                           holidayCalendars: [],
                                            systemCalendar: calendar)
         XCTAssertEqual(content,
 """
@@ -57,7 +57,7 @@ final class DoNotDisturbPluginTests: XCTestCase {
     
     func testWorkTime() {
         let monday2pm = Calendar.current.date(from: DateComponents(year: 2022, month: 08, day: 29, hour: 14))!
-        let content = PluginBinary.content(for: monday2pm, holidayColendars: [])
+        let content = PluginBinary.content(for: monday2pm, holidayCalendars: [])
         XCTAssertEqual(content, "// All is good, do not disturb is off.")
     }
     
