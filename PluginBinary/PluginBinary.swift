@@ -25,7 +25,7 @@ extension String: Error { }
             log("Holidays: \(calPath.replacingOccurrences(of: invocation.packagePath + "/", with: ""))")
         }
 
-        let holidayColendars = try invocation.calendarPaths
+        let holidayCalendars = try invocation.calendarPaths
             .compactMap({
                 return Parser.parse(ics: try String(contentsOfFile: $0)).value
             })
@@ -38,7 +38,7 @@ extension String: Error { }
 //        let date = dateFormatter.date(from:isoDate)!
 
         let date = Date()
-        let content = content(for: date, holidayColendars: holidayColendars)
+        let content = content(for: date, holidayCalendars: holidayCalendars)
         try content.write(to: outputURL, atomically: true, encoding: .utf8)
 
         log("Written '\(invocation.sourcePath)'")
@@ -47,16 +47,22 @@ extension String: Error { }
         try writeLog(at: URL(fileURLWithPath: invocation.logPath))
     }
 
-    static func content(for date: Date, holidayColendars: [iCalendar.Calendar]) -> String {
+    static func content(for date: Date, holidayCalendars: [iCalendar.Calendar], systemCalendar: Foundation.Calendar = .current) -> String {
         log("Current date: \(date.debugDescription)")
 
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM-dd-yy"
-
-        if let holidaySummary = holidayColendars
+        if let holidaySummary = holidayCalendars
             .mapFirst(where: { calendar in
                 return calendar.events.mapFirst { event in
-                    if dateFormatter.string(from: date) == dateFormatter.string(from: event.startDate) {                        log("ITS NOW!")
+                    // iCalendar creates dates for all-day things at noon rather than midnight, so we need to compare date components instead of dates
+                    let startDateComponents = systemCalendar.dateComponents([.year, .month, .day], from: event.startDate)
+                    let currentDateComponents = systemCalendar.dateComponents([.year, .month, .day], from: date)
+                    log("Start components: \(startDateComponents)")
+                    log("Current components: \(currentDateComponents)")
+
+                    if startDateComponents.year == currentDateComponents.year,
+                       startDateComponents.month == currentDateComponents.month,
+                       startDateComponents.day == currentDateComponents.day {
+                        log("ITS NOW!")
                         return "It is \(event.summary ?? "a holiday")"
                     }
                     return nil
@@ -66,15 +72,19 @@ extension String: Error { }
             return content(withReason: holidaySummary)
         }
 
-        if Calendar.current.isDateInWeekend(date) { // Exclude weekend
+        if systemCalendar.isDateInWeekend(date) { // Exclude weekend
             return content(withReason: "It's the weekend")
-        } else if (9.0...18.0 ~= date.time) { // Your 9-6 basically
-            let formatter = DateFormatter()
-            formatter.dateStyle = .none
-            return content(withReason: "It's \(formatter.string(from: date))")
+        } else if (9.0...18.0 ~= date.time) {
+            // Time is in the 9am-6pm range
+            return "// All is good, do not disturb is off."
         }
-
-        return "// All is good, do not disturb is off."
+        
+        let formatter = DateFormatter()
+        formatter.dateStyle = .none
+        formatter.timeStyle = .short
+        formatter.locale = systemCalendar.locale
+        
+        return content(withReason: "It's \(formatter.string(from: date))")
     }
 
     private static func content(withReason reason: String) -> String {
