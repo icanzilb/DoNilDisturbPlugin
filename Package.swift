@@ -2,7 +2,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "DoNotDisturbPlugin",
+    name: "DoNilDisturbPlugin",
     platforms: [
         .macOS(.v11),
         .iOS(.v13),
